@@ -1,0 +1,37 @@
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A PREROUTING -p tcp -m tcp --dport 25 -m comment --comment "BURP" -j REDIRECT --to-ports 9925
+-A PREROUTING -p tcp -m tcp --dport 80 -m comment --comment "BURP" -j REDIRECT --to-ports 9980
+-A PREROUTING -p tcp -m tcp --dport 443 -m comment --comment "BURP" -j REDIRECT --to-ports 9443
+-A PREROUTING -p tcp -m tcp --dport 465 -m comment --comment "BURP" -j REDIRECT --to-ports 9465
+-A PREROUTING -p tcp -m tcp --dport 587 -m comment --comment "BURP" -j REDIRECT --to-ports 9587
+-A PREROUTING -p udp -m udp --dport 53 -m comment --comment "BURP" -j REDIRECT --to-ports 9953
+COMMIT
+*filter
+:INPUT    DROP    [0:0]
+:FORWARD  DROP    [0:0]
+:OUTPUT   ACCEPT  [0:0]
+:logging  -       [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -m comment --comment "SSH" -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9925 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9980 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9443 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9465 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 9587 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -p udp -m state --state NEW -m udp --dport 9953 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p tcp -m tcp --dport 25 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p tcp -m tcp --dport 80 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p tcp -m tcp --dport 443 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p tcp -m tcp --dport 465 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p tcp -m tcp --dport 587 -m comment --comment "BURP" -j ACCEPT
+-A FORWARD -p udp -m udp --dport 53 -m comment --comment "BURP" -j ACCEPT
+-A INPUT -j logging
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+

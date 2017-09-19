@@ -1,0 +1,15 @@
+[Unit]
+Description=Burp Collaborator
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+User=burp
+Group=burp
+SyslogIdentifier=burp
+ExecStart=/usr/bin/java -Xms1g -Xmx1g -jar /home/burp/burp.jar --collaborator-server --collaborator-config=/home/burp/burpcollaborator.config
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
